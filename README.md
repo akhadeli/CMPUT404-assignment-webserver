@@ -3,6 +3,10 @@ CMPUT404-assignment-webserver
 
 CMPUT404-assignment-webserver
 
+Abdullah Khadeli
+SID: 1722102
+CCID: akhadeli
+
 See requirements.org (plain-text) for a description of the project.
 
 Make a simple webserver.
@@ -24,3 +28,12 @@ examples thus some of the code is Copyright © 2001-2013 Python
 Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
+No collaboration with other students
+Sources used:
+
+https://docs.python.org/3/library/socketserver.html
+https://docs.python.org/3/whatsnew/3.11.html#os
+https://developer.mozilla.org/en-US/
+https://datatracker.ietf.org/doc/html/rfc2616
+https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+Class notes/discussion

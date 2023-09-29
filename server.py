@@ -1,6 +1,5 @@
 #  coding: utf-8 
 import socketserver
-import threading
 import os
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
@@ -33,10 +32,13 @@ class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
+        print ("Got a request of: %s\n" % self.data)
 
+        # Upon empty data, closure of connection
         if len(self.data.decode('utf-8')) == 0:
             return
 
+        # Setting up some base header values for later use
         self.header_base = {
             'http': 'HTTP/1.1',
             'status': '200 OK',
@@ -45,9 +47,8 @@ class MyWebServer(socketserver.BaseRequestHandler):
             'location': ''
         }
 
+        # Extracting necessary request details
         self.data_list = self.data.decode('utf-8').split('\r\n')
-        print ("Got a request of: %s\n" % self.data)
-
         req_details = self.data_list[0].split()
         req_method = req_details[0]
         req_path = req_details[1]
@@ -55,20 +56,39 @@ class MyWebServer(socketserver.BaseRequestHandler):
         if req_method == "GET":
             self.getPath(req_path)
         else:
+            # Limiting to GET
             self.error405()
 
-        self.request.sendall(bytearray(self.handleHeaders(),'utf-8'))
+        self.request.sendall(bytearray(self.response(),'utf-8'))
 
 
-    def error301(self, path, root_length):
+    def error301(self, location):
         self.header_base['status'] = "301 Moved Permanently"
         self.header_base['content-type'] = "text/html; charset=UTF-8"
-        self.header_base['location'] = path[root_length:] + "/"
+
+        # Location is set by function caller
+        self.header_base['location'] = location
+
+        # Simple body for 301 Moved Permanently
+        self.header_base['body'] = '''  <!DOCTYPE html>
+                                        <html>
+                                        <head>
+                                            <title>301 Moved Permanently</title>
+                                                <meta http-equiv="Content-Type"
+                                                content="text/html;charset=utf-8"/>
+                                        </head>
+                                        <body>
+                                            <p>301 Moved Permanently<p>
+                                        </body>
+                                        </html> 
+                                    '''
 
 
     def error404(self):
         self.header_base['status'] = "404 Not Found"
         self.header_base['content-type'] = "text/html; charset=UTF-8"
+
+        # Simple body for 404 Not Found
         self.header_base['body'] = '''  <!DOCTYPE html>
                                         <html>
                                         <head>
@@ -86,7 +106,8 @@ class MyWebServer(socketserver.BaseRequestHandler):
         self.header_base['status'] = "405 Method not allowed"
 
 
-    def handleHeaders(self):
+    def response(self):
+        # Final function call, prepping the response
         headers = self.header_base['http'] + " " + self.header_base['status'] + "\r\n"
         headers += "Content-Type: " + self.header_base['content-type'] + "\r\n"
         headers += "Content-Length: " + str(len(self.header_base['body'].encode('utf-8'))) + "\r\n"
@@ -97,11 +118,13 @@ class MyWebServer(socketserver.BaseRequestHandler):
 
 
     def getPath(self, path):
-        print("REQUESTED PATH:", path, '\n')
+        # File access is built around the absolute path to www
         root_path = os.path.abspath("www")
+
+        # For accessing relative path provided by URI
         root_length = len(root_path)
 
-        # Clean up multiple consecutive slashes
+        # Clean up multiple consecutive slashes and break .. for security
         cleaned_path = ""
         for i in range(len(path)):
             if path[i] == "?":
@@ -115,12 +138,15 @@ class MyWebServer(socketserver.BaseRequestHandler):
                     if path[i+1] == ".":
                         continue
             cleaned_path += path[i]
-
+        
+        # Further slash cleanup
         if cleaned_path == "/":
             path_list = ['']
         else:
             path_list = cleaned_path.split('/')[1:]
 
+        # Loop to check paths, will catch onto non existent paths
+        # before the whole path is parsed
         for p in path_list:
             if p == "":
                 root_path += "/"
@@ -130,28 +156,40 @@ class MyWebServer(socketserver.BaseRequestHandler):
                 self.error404()
                 return
         
+        # Ensuring that slashes after a directory will send index.html
+        # additional safety for when a slash is added after a file path
+        root_path_split = root_path.split('/')
         if root_path.endswith('/'):
-            root_path += "index.html"
+            if not ("html" in root_path_split[-2] or ".css" in root_path_split[-2]):
+                root_path += "index.html"
+            else:
+                self.error301(root_path[root_length:-1])
+                return
 
-        print("PROCESSED PATH:", root_path[root_length:], '\n')
-
+        # Retrieving body
         self.getFile(root_path, root_length)
         return
 
 
     def getFile(self, path, root_length):
+        # Enforcing that paths leading to directories need a slash
         if os.path.isdir(path):
-            self.error301(path, root_length)
+            self.error301(path[root_length:] + "/")
             return
         try:
-            if path.endswith('html'):
+            # Adding support for html and css MIME types
+            if path.endswith('.html'):
                 self.header_base['content-type'] = "text/html; charset=UTF-8"
-            if path.endswith('css'):
+            if path.endswith('.css'):
                 self.header_base['content-type'] = "text/css; charset=UTF-8"
             with open(path) as file:
                 self.header_base['body'] = file.read()
             return
+        # Conditions to handle possible errors
         except FileNotFoundError:
+            self.error404()
+            return
+        except NotADirectoryError:
             self.error404()
             return
 
