@@ -24,6 +24,7 @@ https://docs.python.org/3/whatsnew/3.11.html#os
 https://developer.mozilla.org/en-US/
 https://datatracker.ietf.org/doc/html/rfc2616
 https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html
+
 Class notes/discussion
 
 Contributors / Licensing
