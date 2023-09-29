@@ -31,6 +31,24 @@ Class notes/discussion
 Contributors / Licensing
 ========================
 
+LICENSED under the Apache 2 license by Abdullah Khadeli
+
+server.py contains contributions from:
+
+* Abdullah Khadeli
+
+server.py is derived from Abram Hindle and contributors' work
+and thus some code is Copyright © 2013 Abram Hindle, Eddie Antonio Santos
+
+https://github.com/abramhindle/CMPUT404-assignment-webserver
+
+server.py is also derived from the python documentation
+examples thus some of the code is Copyright © 2001-2013 Python
+Software Foundation; All Rights Reserved under the PSF license (GPL
+compatible) http://docs.python.org/2/library/socketserver.html
+
+Previously licensed under Abram Hindle (See below)
+
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
 
 server.py contains contributions from:

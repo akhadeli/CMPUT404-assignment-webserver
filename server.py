@@ -2,7 +2,7 @@
 import socketserver
 import os
 
-# Copyright 2013 Abram Hindle, Eddie Antonio Santos
+# Copyright 2023 Abdullah Khadeli
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,12 @@ import os
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+# This project is built from CMPUT404-assignment-webserver thus
+# some of the code is Copyright © 2013 Abram Hindle, Eddie Antonio Santos
+#
+# https://github.com/abramhindle/CMPUT404-assignment-webserver
 #
 #
 # Furthermore it is derived from the Python documentation examples thus

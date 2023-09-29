@@ -1,0 +1,9 @@
+Apache CMPUT404-assignment-webserver
+Copyright 2023 The Apache Software Foundation.
+
+Changes were made to server.py in order to create
+a working webserver. Images were added to the root 
+as required per requirements.org
+
+This product includes software developed by the
+Python Software Foundation, Abram Hindle and Eddie Antonio Santos.
