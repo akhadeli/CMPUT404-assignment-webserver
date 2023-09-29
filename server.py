@@ -1,5 +1,6 @@
 #  coding: utf-8 
 import socketserver
+import os
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -31,8 +32,38 @@ class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
+
+        self.header_base = {
+            'http': 'HTTP/1.1',
+            'status': '200 OK'
+        }
+
+        self.data_list = self.data.decode('utf-8').split('\r\n')
         print ("Got a request of: %s\n" % self.data)
-        self.request.sendall(bytearray("OK",'utf-8'))
+        print(self.data_list)
+
+        req_details = self.data_list[0].split()
+        req_method = req_details[0]
+        req_path = req_details[1]
+
+        if req_method == "GET":
+            self.getPath(os.path.abspath("www") + req_path)
+
+        self.request.sendall(bytearray(self.response(),'utf-8'))
+
+    def error404(self):
+        self.header_base['status'] = '404 Not Found'
+
+    def handleHeaders(self):
+        headers = f'''{self.header_base['http']} {self.header_base['status']}'''
+        return headers
+
+    def getPath(self, path):
+        print(path)
+
+    def response(self):
+        resp = self.handleHeaders()
+        return resp
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
